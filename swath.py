@@ -1,12 +1,15 @@
 #######################################################
 #                                                     #
-# Univer,sity of Georgia SmallSat Research Laboratory  #
+# University of Georgia SmallSat Research Laboratory  #
 # Nicholas Neel                                       #
 #                                                     #
 #######################################################
 import math
 
 class camera:
+
+
+
 	def __init__( self ,  altitude=400 , object_radius=6371, offsetx = 0 , offsety = 0, field_of_viewx = -1 , field_of_viewy = -1, dist_sensorx = -1, dist_sensory =-1, num_pixelsx = -1, num_pixelsy =-1, focal_length = -1, name = "Default" ):
 		
 		
@@ -27,13 +30,29 @@ class camera:
 		self.__focal_length = focal_length
 		self.__name = name
 
+
+
+
+
 	def swath_sphere(self,string = "x"):
+		''' swath_sphere(self,string) takes a camera object and calculates  swath if possible in the x or y direction '''
 		alt = float(self.__altitude)
 		re = float(self.__radius_of_the_object)
+
 		if string == "x":
+			if self.__field_of_view_x == -1:
+				self.recalulate_field_of_view('x')
+				if self.field_of_view_x == -1:
+					print "insufficient information"
+					return 0
 			fov = float(self.__field_of_view_x)
 			off = float(self.__offset_x)
 		if string == "y":
+			if self.__field_of_view_y == -1:
+				self.recalulate_field_of_view('y')
+				if self.field_of_view_y == -1:
+					print "insufficient information"
+					return 0
 			fov = float(self.__field_of_view_y)
 			off = float(self.__offset_y)
 		ang1 = float(off + (fov/2.))
@@ -56,13 +75,22 @@ class camera:
 		if omega1-omega2 <= 0:
 			return -re*(omega1-omega2)
 		return re*(omega1-omega2)
-	
+
+
+
+
 	def meters_per_pixel(self, string = "x",x=0,y=0):
 		if string == "x":
+			if x >= self.__num_pixels_x:
+				print "Invalid Pixel"
+				return 0
 			fov  = float(self.__field_of_view_x)
 			angle_pixel = fov/float(self.__num_pixels_x)
 			off = float(self.__offset_x)
 		if string == "y":
+			if y >= self.__num_pixels_y:
+				print "Invalid Pixel"
+				return 0
 			fov = self.__field_of_view_y
 			angle_pixel = fov/float(self.__num_pixels_y)
 			off = float(self.__offset_y)
@@ -87,6 +115,8 @@ class camera:
 		if omega1-omega2 <= 0:
 			return -re*(omega1-omega2)*1000.0
 		return re*(omega1-omega2)*1000.0
+
+
 
 	def foreign_lens_object(self,string = "x",obj_radius_mm = 31,obj_center=0,cross_section_mm=31):
 
@@ -123,7 +153,6 @@ class camera:
 			return -re*(omega1-omega2)
 		return re*(omega1-omega2)
 
-		
 
 
 	def set_altitue(self,num):
@@ -156,6 +185,7 @@ class camera:
 		self.name = string
 	def properties(self):
 		return {"total_pixels": self.__num_total_pixels,"num_pixels_x":self.__num_pixels_x,"num_pixels_y":self.__num_pixels_y,"sensor_size_x_mm" :self.__sensor_size_x,"sensor_size_y_mm":self.__sensor_size_y,"altitude":self.__altitude,"radius_of_the_object":self.__radius_of_the_object,"camera_offset_x": self.__offset_x,"camera_offset_y":self.__offset_y ,"field_of_view_x": self.__field_of_view_x,"field_of_view_y":self.__field_of_view_y,"name" : self.__name}
+
 
 
 	def recalculate_field_of_view(self,v="a"):
