@@ -78,7 +78,7 @@ class camera:
 
 
 
-
+	# This is currently only accurate for the "center pixel" needs refining.
 	def meters_per_pixel(self, string = "x",x=0,y=0):
 		if string == "x":
 			if x >= self.__num_pixels_x:
@@ -115,6 +115,10 @@ class camera:
 		if omega1-omega2 <= 0:
 			return -re*(omega1-omega2)*1000.0
 		return re*(omega1-omega2)*1000.0
+
+
+	
+	def area_per_pixel(self,x=0,y=0)
 
 
 
@@ -189,7 +193,6 @@ class camera:
 
 
 	def recalculate_field_of_view(self,v="a"):
-
 		if (v == "a" or v == "x") and self.__sensor_size_x != -1 and self.__focal_length != -1:
 			self.__field_of_view_x = 2.0*math.atan(float(self.__sensor_size_x)/(2.0*float(self.__focal_length)))*180/math.pi
 
