@@ -126,7 +126,7 @@ class camera:
 		
 
 
-	def set_altitue(self,num):
+	def set_altitude(self,num):
 		self.__altitude = num
 	def set_object_radius(self,num):
 		self.__radius_of_the_object = num
@@ -171,6 +171,14 @@ class camera:
 			print "        Need sensor size information and focal length"
 			return -1
 		return
+
+	def swath_dust(self,v = "x",dustsize_m,cross_section_x = 0,cross_section_y= 0,x,y):
+		if v == "x":
+			ang = math.atan(distsize_m/(cross_section_x*math.tan(self.__field_of_view_x/2)))
+		if v == "y":
+			ang = math.atan(distsize_m/(cross_section_y*math.tan(self.__field_of_view_y/2)))
+
+
 
 
 nanocam = camera(650,6371,0,0,-1,-1,6.55,4.92,2048,1536,70,"NanoCam C1U")
