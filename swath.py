@@ -117,9 +117,6 @@ class camera:
 		return re*(omega1-omega2)*1000.0
 
 
-	
-	def area_per_pixel(self,x=0,y=0)
-
 
 
 	def foreign_lens_object(self,string = "x",obj_radius_mm = 31,obj_center=0,cross_section_mm=31):
