@@ -88,42 +88,6 @@ class camera:
 			return -re*(omega1-omega2)*1000.0
 		return re*(omega1-omega2)*1000.0
 
-	def foreign_lens_object(self,string = "x",obj_radius_mm = 31,obj_center=0,cross_section_mm=31):
-
-		if string == "x":
-			fov  = float(self.__field_of_view_x)
-			off = float(self.__offset_x)
-		if string == "y":
-			fov = self.__field_of_view_y
-			off = float(self.__offset_y)
-
-		angle_obstr = (math.atan(((float(cross_section_mm)/2.0)*(math.tan(fov/2.))/(2.0*float(obj_radius_mm))))/2.)*180/math.pi
-		ang_cent = (math.atan(float(obj_center)/((float(cross_section_mm))/(2.0*math.tan(fov/2.)))))*180/math.pi
-		print angle_obstr,ang_cent
-		alt = float(self.__altitude)
-		re = float(self.__radius_of_the_object)
-		ang1 = float((off + angle_obstr)+ang_cent)
-		ang2 = float((off - angle_obstr)+ang_cent)
-
-
-		omega1 = (math.asin(((alt/re)+1.)*math.sin(ang1*math.pi/180.)) - (ang1)*math.pi/180.)
-		omega2 = math.asin(((alt/re)+1.)*math.sin(ang2*math.pi/180.)) - ang2*math.pi/180.
-		
-		while omega1 > math.pi/2. or omega1 < -math.pi/2.:
-			if omega1 > math.pi/2.:
-				omega1 -= math.pi
-			if omega1 < -math.pi/2.:
-				omega1 += math.pi
-		while omega2 > math.pi/2. or omega2 < -math.pi/2.:
-			if omega2 > math.pi/2.:
-				omega2 -= math.pi
-			if omega2 < -math.pi/2.:
-				omega2 += math.pi
-		if omega1-omega2 <= 0:
-			return -re*(omega1-omega2)
-		return re*(omega1-omega2)
-
-		
 
 
 	def set_altitude(self,num):
@@ -152,8 +116,11 @@ class camera:
 		self.__num_pixels_y = num
 	def set_focal_length(self,num):
 		self.__focal_length = num
+		self.recalculate_field_of_view()
 	def set_name(self,string):
 		self.__name = string
+
+
 	def properties(self):
 		return {"focal length":self.__focal_length,"altitude" : self.__altitude,"total_pixels": self.__num_total_pixels,"num_pixels_x":self.__num_pixels_x,"num_pixels_y":self.__num_pixels_y,"sensor_size_x_mm" :self.__sensor_size_x,"sensor_size_y_mm":self.__sensor_size_y,"altitude":self.__altitude,"radius_of_the_object":self.__radius_of_the_object,"camera_offset_x": self.__offset_x,"camera_offset_y":self.__offset_y ,"field_of_view_x": self.__field_of_view_x,"field_of_view_y":self.__field_of_view_y,"name" : self.__name}
 
@@ -172,13 +139,55 @@ class camera:
 			return -1
 		return
 
-	def swath_dust(self,v = "x",dustsize_m,cross_section_x = 0,cross_section_y= 0,x,y):
+
+	def foreign_object_mm(self,object_size_mm = 0,cross_section_mm=(0,0),v="x", object_center_mm = (0,0)):
+
 		if v == "x":
-			ang = math.atan(distsize_m/(cross_section_x*math.tan(self.__field_of_view_x/2)))
+			theta = (self.__field_of_view_x)*math.pi/180
+			cross = cross_section_mm[0]
+			center = object_center_mm[0]
+			off = float(self.__offset_x)
 		if v == "y":
-			ang = math.atan(distsize_m/(cross_section_y*math.tan(self.__field_of_view_y/2)))
+			theta = self.__field_of_view_y
+			cross = cross_section_mm[1]
+			center = object_center_mm[1]
+			off = float(self.offset_y)
+		alt = float(self.__altitude)
+		re = float(self.__radius_of_the_object)
+		height = cross/(2*math.tan(theta/2.))
 
+		pt1 = abs(center) + abs(object_size_mm/2.)
+		pt2 = abs(center) - abs(object_size_mm/2.)
+		
+		ang1 = math.atan(pt1/height)
+		ang2 = math.atan(pt2/height)
+			
 
+		
+
+		ang1 = float(off + ang1)
+		ang2 = float(off + ang2)
+
+		omega1 = math.asin(((alt/re)+1.)*math.sin(ang1)) - ang1
+		omega2 = math.asin(((alt/re)+1.)*math.sin(ang2)) - ang2
+		
+		while omega1 > math.pi/2. or omega1 < -math.pi/2.:
+		
+			if omega1 > math.pi/2.:
+				omega1 -= math.pi
+			if omega1 < -math.pi/2.:
+				omega1 += math.pi
+		while omega2 > math.pi/2. or omega2 < -math.pi/2.:
+			if omega2 > math.pi/2.:
+				omega2 -= math.pi
+			if omega2 < -math.pi/2.:
+				omega2 += math.pi
+		if omega1-omega2 <= 0:
+			return -re*(omega1-omega2)
+		return re*(omega1-omega2)
+	
+
+		
 
 
 nanocam = camera(650,6371,0,0,-1,-1,6.55,4.92,2048,1536,70,"NanoCam C1U")
